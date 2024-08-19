@@ -2,9 +2,10 @@ app_name = "woocommerce_sync"
 app_title = "WooCommerce Sync"
 app_publisher = "Jeriel Francis"
 app_description = "Sync ERP V15 to WooCommerce using REST API."
-app_email = "jeriel@jollys.local"
+app_email = "francisbeatsproductions@gmail.com"
 app_license = "mit"
 # required_apps = []
+fixtures = ["Custom Field"]
 
 # Includes in <head>
 # ------------------

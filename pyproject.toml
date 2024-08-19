@@ -1,7 +1,7 @@
 [project]
 name = "woocommerce_sync"
 authors = [
-    { name = "Jeriel Francis", email = "jeriel@jollys.local"}
+    { name = "Jeriel Francis", email = "francisbeatsproductions@gmail.com"}
 ]
 description = "Sync ERP V15 to WooCommerce using REST API."
 requires-python = ">=3.10"
