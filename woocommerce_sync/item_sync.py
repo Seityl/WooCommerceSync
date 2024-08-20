@@ -248,61 +248,61 @@ def get_item_group(item_code):
 #         return 'Nos'
 
 #TODO: Finish this
-def get_erpnext_items(price_list):
-    erpnext_items = []
-    woocommerce_settings = frappe.get_doc("WooCommerce Config", "WooCommerce Config")
+# def get_erpnext_items(price_list):
+#     erpnext_items = []
+#     woocommerce_settings = frappe.get_doc("WooCommerce Config", "WooCommerce Config")
 
-    last_sync_condition, item_price_condition = "", ""
-    if woocommerce_settings.last_sync_datetime:
-        last_sync_condition = "and modified >= '{0}' ".format(woocommerce_settings.last_sync_datetime)
-        item_price_condition = "AND `tabItem Price`.`modified` >= '{0}' ".format(woocommerce_settings.last_sync_datetime)
+#     last_sync_condition, item_price_condition = "", ""
+#     if woocommerce_settings.last_sync_datetime:
+#         last_sync_condition = "and modified >= '{0}' ".format(woocommerce_settings.last_sync_datetime)
+#         item_price_condition = "AND `tabItem Price`.`modified` >= '{0}' ".format(woocommerce_settings.last_sync_datetime)
 
-    item_from_master = """select name, item_code, item_name, item_group,
-        description, woocommerce_description, has_variants, variant_of, stock_uom, image, woocommerce_product_id,
-        woocommerce_variant_id, sync_qty_with_woocommerce, weight_per_unit, weight_uom from tabItem
-        where sync_with_woocommerce=1 and (variant_of is null or variant_of = '')
-        and (disabled is null or disabled = 0)  %s """ % last_sync_condition
+#     item_from_master = """select name, item_code, item_name, item_group,
+#         description, woocommerce_description, has_variants, variant_of, stock_uom, image, woocommerce_product_id,
+#         woocommerce_variant_id, sync_qty_with_woocommerce, weight_per_unit, weight_uom from tabItem
+#         where sync_with_woocommerce=1 and (variant_of is null or variant_of = '')
+#         and (disabled is null or disabled = 0)  %s """ % last_sync_condition
 
-    erpnext_items.extend(frappe.db.sql(item_from_master, as_dict=1))
+#     erpnext_items.extend(frappe.db.sql(item_from_master, as_dict=1))
 
-    template_items = [item.name for item in erpnext_items if item.has_variants]
+#     template_items = [item.name for item in erpnext_items if item.has_variants]
 
-    if len(template_items) > 0:
-    #    item_price_condition += ' and i.variant_of not in (%s)'%(' ,'.join(["'%s'"]*len(template_items)))%tuple(template_items)
-        # escape raw item name
-        for i in range(len(template_items)):
-            template_items[i] = template_items[i].replace("'", r"\'")
-        # combine condition
-        item_price_condition += ' AND `tabItem`.`variant_of` NOT IN (\'{0}\')'.format(
-            ("' ,'".join(template_items)))
+#     if len(template_items) > 0:
+#     #    item_price_condition += ' and i.variant_of not in (%s)'%(' ,'.join(["'%s'"]*len(template_items)))%tuple(template_items)
+#         # escape raw item name
+#         for i in range(len(template_items)):
+#             template_items[i] = template_items[i].replace("'", r"\'")
+#         # combine condition
+#         item_price_condition += ' AND `tabItem`.`variant_of` NOT IN (\'{0}\')'.format(
+#             ("' ,'".join(template_items)))
     
-    item_from_item_price = """SELECT `tabItem`.`name`, 
-                                     `tabItem`.`item_code`, 
-                                     `tabItem`.`item_name`, 
-                                     `tabItem`.`item_group`, 
-                                     `tabItem`.`description`,
-                                     `tabItem`.`woocommerce_description`, 
-                                     `tabItem`.`has_variants`, 
-                                     `tabItem`.`variant_of`, 
-                                     `tabItem`.`stock_uom`, 
-                                     `tabItem`.`image`, 
-                                     `tabItem`.`woocommerce_product_id`,
-                                     `tabItem`.`woocommerce_variant_id`, 
-                                     `tabItem`.`sync_qty_with_woocommerce`, 
-                                     `tabItem`.`weight_per_unit`, 
-                                     `tabItem`.`weight_uom`
-        FROM `tabItem`, `tabItem Price`
-        WHERE `tabItem Price`.`price_list` = '%s' 
-          AND `tabItem`.`name` = `tabItem Price`.`item_code`
-          AND `tabItem`.`sync_with_woocommerce` = 1 
-          AND (`tabItem`.`disabled` IS NULL OR `tabItem`.`disabled` = 0) %s""" %(price_list, item_price_condition)
-    frappe.log_error("{0}".format(item_from_item_price))
+#     item_from_item_price = """SELECT `tabItem`.`name`, 
+#                                      `tabItem`.`item_code`, 
+#                                      `tabItem`.`item_name`, 
+#                                      `tabItem`.`item_group`, 
+#                                      `tabItem`.`description`,
+#                                      `tabItem`.`woocommerce_description`, 
+#                                      `tabItem`.`has_variants`, 
+#                                      `tabItem`.`variant_of`, 
+#                                      `tabItem`.`stock_uom`, 
+#                                      `tabItem`.`image`, 
+#                                      `tabItem`.`woocommerce_product_id`,
+#                                      `tabItem`.`woocommerce_variant_id`, 
+#                                      `tabItem`.`sync_qty_with_woocommerce`, 
+#                                      `tabItem`.`weight_per_unit`, 
+#                                      `tabItem`.`weight_uom`
+#         FROM `tabItem`, `tabItem Price`
+#         WHERE `tabItem Price`.`price_list` = '%s' 
+#           AND `tabItem`.`name` = `tabItem Price`.`item_code`
+#           AND `tabItem`.`sync_with_woocommerce` = 1 
+#           AND (`tabItem`.`disabled` IS NULL OR `tabItem`.`disabled` = 0) %s""" %(price_list, item_price_condition)
+#     frappe.log_error("{0}".format(item_from_item_price))
 
-    updated_price_item_list = frappe.db.sql(item_from_item_price, as_dict=1)
+#     updated_price_item_list = frappe.db.sql(item_from_item_price, as_dict=1)
 
-    # to avoid item duplication
-    return [frappe._dict(tupleized) for tupleized in set(tuple(item.items())
-        for item in erpnext_items + updated_price_item_list)]
+#     # to avoid item duplication
+#     return [frappe._dict(tupleized) for tupleized in set(tuple(item.items())
+#         for item in erpnext_items + updated_price_item_list)]
 
 # TODO: Finish this
 def get_item_image(woocommerce_item):
@@ -315,37 +315,37 @@ def get_item_image(woocommerce_item):
         return None
 
 #TODO: Finish this
-def add_woocommerce_items_to_erp():
-    woocommerce_items = get_woocommerce_items_from_doctype()
+# def add_woocommerce_items_to_erp():
+#     woocommerce_items = get_woocommerce_items_from_doctype()
 
-    # Delete all existing woocommerce items before reinitializing 
-    if woocommerce_items:
-        for woocommerce_item in woocommerce_items:
-            frappe.delete_doc('WooCommerce Item', woocommerce_item['name'])
+#     # Delete all existing woocommerce items before reinitializing 
+#     if woocommerce_items:
+#         for woocommerce_item in woocommerce_items:
+#             frappe.delete_doc('WooCommerce Item', woocommerce_item['name'])
 
-    item_codes_and_ids = get_item_codes_and_ids_from_woocommerce()
-    # make_woocommerce_log(title="Items Codes and IDs Before", status="Success", method="add_woocommerce_items_to_erp", message=str(item_codes_and_ids))
+#     item_codes_and_ids = get_item_codes_and_ids_from_woocommerce()
+#     # make_woocommerce_log(title="Items Codes and IDs Before", status="Success", method="add_woocommerce_items_to_erp", message=str(item_codes_and_ids))
 
-    item_list = [item_code for item in frappe.get_all('Item') for item_code in item.values()]
-    # These items exist on WooCommerce but not on ERP
-    items_to_not_be_added = [woocommerce_item['name'] for woocommerce_item in woocommerce_items if woocommerce_item['name'] not in item_list]
+#     item_list = [item_code for item in frappe.get_all('Item') for item_code in item.values()]
+#     # These items exist on WooCommerce but not on ERP
+#     items_to_not_be_added = [woocommerce_item['name'] for woocommerce_item in woocommerce_items if woocommerce_item['name'] not in item_list]
 
-    for item in items_to_not_be_added:
-        if item in list(item_codes_and_ids.keys()): 
-            # make_woocommerce_log(title="Item", status="Success", method="add_woocommerce_items_to_erp", message=item)
-            del item_codes_and_ids[item]
+#     for item in items_to_not_be_added:
+#         if item in list(item_codes_and_ids.keys()): 
+#             # make_woocommerce_log(title="Item", status="Success", method="add_woocommerce_items_to_erp", message=item)
+#             del item_codes_and_ids[item]
 
-    # make_woocommerce_log(title="Items Codes and IDs After", status="Success", method="add_woocommerce_items_to_erp", message=str(item_codes_and_ids))
-    # # make_woocommerce_log(title="Items", status="Success", method="add_woocommerce_items_to_erp", message=str(items_to_not_be_added))
+#     # make_woocommerce_log(title="Items Codes and IDs After", status="Success", method="add_woocommerce_items_to_erp", message=str(item_codes_and_ids))
+#     # # make_woocommerce_log(title="Items", status="Success", method="add_woocommerce_items_to_erp", message=str(items_to_not_be_added))
 
-    for item_code, woocommerce_item_id in item_codes_and_ids.items():
-        woocommerce_item = frappe.get_doc({
-            'doctype': 'WooCommerce Item',
-            'item_code': item_code,
-            'woocommerce_item_id': woocommerce_item_id
-        })
+#     for item_code, woocommerce_item_id in item_codes_and_ids.items():
+#         woocommerce_item = frappe.get_doc({
+#             'doctype': 'WooCommerce Item',
+#             'item_code': item_code,
+#             'woocommerce_item_id': woocommerce_item_id
+#         })
 
-        woocommerce_item.insert()
+#         woocommerce_item.insert()
 
 # TODO: Finish this
 # def add_to_price_list(item, name):
@@ -548,6 +548,7 @@ def update_item_price(item_code, price_list, woocommerce_item_id=None):
 
         else:
             raise e
+
 def update_item_prices(item_group=None, price_list=None):
     if item_group:
         for item in frappe.get_all("WooCommerce Item", fields=["stock_keeping_unit"], filters={"sync_to_woocommerce": 1, "item_group": item_group}):
@@ -577,7 +578,8 @@ def update_item_prices(item_group=None, price_list=None):
                 else:
                     make_woocommerce_log(title="{0}".format(e), status="Error", method="sync_woocommerce_items", message=frappe.get_traceback(),
                         request_data=item, exception=True)
-
+                        
+#TODO: Finish this
 def is_item_exists(item_dict, attributes=None, variant_of=None):
     # woocommerce_item_id = str(item_dict['woocommerce_item_id'])
     # erp_item_match = frappe.get_all("WooCommerce Item",filters={'woocommerce_item_id': woocommerce_item_id})[0]
