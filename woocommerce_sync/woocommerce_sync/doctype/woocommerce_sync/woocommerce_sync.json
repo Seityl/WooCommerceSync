@@ -17,26 +17,26 @@
   "enable_sync",
   "verify_ssl_wip",
   "sync_only_published",
-  "section_break_pzow",
+  "section_break_sync_based_on",
   "sync_based_on",
+  "item_group",
   "column_break_hfze",
   "item_code",
   "woocommerce_product_id",
   "section_break_options",
   "warehouse",
   "price_list",
-  "stock_unit_of_measure",
   "column_break_ouln",
   "valuation_method",
-  "weight_unit"
+  "weight_unit",
+  "stock_unit_of_measure"
  ],
  "fields": [
   {
    "fieldname": "woocommerce_url",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "WooCommerce URL",
-   "reqd": 1
+   "label": "WooCommerce URL"
   },
   {
    "fieldname": "section_break_uxzv",
@@ -46,8 +46,7 @@
    "fieldname": "api_key",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Consumer Key",
-   "reqd": 1
+   "label": "Consumer Key"
   },
   {
    "fieldname": "column_break_nybd",
@@ -57,8 +56,7 @@
    "fieldname": "api_secret",
    "fieldtype": "Password",
    "in_list_view": 1,
-   "label": "Consumer Secret",
-   "reqd": 1
+   "label": "Consumer Secret"
   },
   {
    "fieldname": "section_break_ysfy",
@@ -69,8 +67,7 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Sync Options",
-   "options": "Bulk Sync\nSingle Item Sync",
-   "reqd": 1
+   "options": "\nSync Single Item\nSync Item Group\nSync All Items"
   },
   {
    "fieldname": "column_break_glix",
@@ -86,24 +83,20 @@
    "default": "0",
    "fieldname": "verify_ssl_wip",
    "fieldtype": "Check",
+   "hidden": 1,
    "label": "Verify SSL (WIP)"
-  },
-  {
-   "fieldname": "section_break_pzow",
-   "fieldtype": "Section Break"
   },
   {
    "fieldname": "sync_based_on",
    "fieldtype": "Select",
    "label": "Sync Based On",
-   "options": "Item Code\nWooCommerce Product ID"
+   "options": "\nItem Code\nWooCommerce Product ID"
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
    "label": "Warehouse",
-   "options": "Warehouse",
-   "reqd": 1
+   "options": "Warehouse"
   },
   {
    "fieldname": "column_break_hfze",
@@ -140,8 +133,9 @@
   {
    "fieldname": "valuation_method",
    "fieldtype": "Select",
+   "hidden": 1,
    "label": "Valuation Method",
-   "options": "FIFO\nMoving Average\nLIFO"
+   "options": "\nFIFO\nLIFO\nMoving Average"
   },
   {
    "fieldname": "weight_unit",
@@ -167,11 +161,21 @@
    "fieldtype": "Link",
    "label": "Stock UOM",
    "options": "UOM"
+  },
+  {
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "section_break_sync_based_on",
+   "fieldtype": "Section Break"
   }
  ],
  "issingle": 1,
  "links": [],
- "modified": "2024-08-16 10:32:42.158040",
+ "modified": "2024-08-19 11:04:25.184899",
  "modified_by": "Administrator",
  "module": "WooCommerce Sync",
  "name": "WooCommerce Sync",
@@ -184,6 +188,16 @@
    "print": 1,
    "read": 1,
    "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Website Manager",
    "share": 1,
    "write": 1
   }

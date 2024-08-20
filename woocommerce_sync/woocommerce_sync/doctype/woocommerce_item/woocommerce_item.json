@@ -22,10 +22,13 @@
   "weight_uom",
   "column_break_svrv",
   "item_group",
-  "variant_of",
+  "price",
   "default_warehouse",
   "stock_keeping_unit",
   "weight_per_unit",
+  "variant_of",
+  "section_break_zfmg",
+  "product_category",
   "section_break_jjms",
   "attributes",
   "section_break_mkvn",
@@ -54,6 +57,7 @@
   {
    "fieldname": "variant_of",
    "fieldtype": "Data",
+   "hidden": 1,
    "label": "Variant Of"
   },
   {
@@ -101,7 +105,8 @@
   {
    "fieldname": "attributes",
    "fieldtype": "Table",
-   "label": "Attributes",
+   "hidden": 1,
+   "label": "Attributes WIP",
    "options": "Item Attribute Value"
   },
   {
@@ -169,11 +174,27 @@
   {
    "fieldname": "section_break_jjms",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_zfmg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "product_category",
+   "fieldtype": "Table",
+   "hidden": 1,
+   "label": "Product Category WIP",
+   "options": "WooCommerce Category"
+  },
+  {
+   "fieldname": "price",
+   "fieldtype": "Data",
+   "label": "Price"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-15 16:01:14.228171",
+ "modified": "2024-08-19 16:03:42.261542",
  "modified_by": "Administrator",
  "module": "WooCommerce Sync",
  "name": "WooCommerce Item",

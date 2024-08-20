@@ -135,6 +135,31 @@ def get_woocommerce_items(ignore_filter_conditions=False):
 
     return woocommerce_products
 
+def get_single_woocommerce_item(item_code, ignore_filter_conditions=False):
+    woocommerce_settings = get_woocommerce_settings()
+    filter_condition = ''
+
+    if not ignore_filter_conditions:
+        filter_condition = get_filtering_condition()
+
+        if woocommerce_settings['sync_only_published'] == 1:
+            filter_condition += "status=publish"
+            
+    if item_code:
+        r = get_request('wp-json/wc/v3/products?sku={0}&{1}'.format(item_code, filter_condition))
+
+        if r:
+            woocommerce_product = r
+            return woocommerce_product[0]
+
+    # if woocommerce_product_id:
+    #     # Assumes that products synced using woocommerce product ID are published
+    #     r = get_request('wp-json/wc/v3/products/{0}'.format(woocommerce_product_id))
+        
+    #     if r:
+    #         woocommerce_product = r
+    #         return woocommerce_product
+
 def get_woocommerce_item_variants(woocommerce_product_id):
     woocommerce_product_variants = []
     filter_condition = ''

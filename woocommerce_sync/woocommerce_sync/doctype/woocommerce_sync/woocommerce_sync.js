@@ -10,6 +10,7 @@ frappe.ui.form.on("WooCommerce Sync", {
                 freeze_message: __('Clearing Logs...')
             })
         });
+
         sync_based_on_visibility(frm);
         sync_based_on_options_visibility(frm);
 	},
@@ -32,29 +33,78 @@ frappe.ui.form.on("WooCommerce Sync", {
 });
 
 function sync_based_on_visibility(frm) {
-    if (frm.doc.sync_options === 'Single Item Sync') {
-        frm.toggle_display('sync_based_on', true);
+    if (frm.doc.sync_options === '') {
+        clear_sync_based_on_values(frm)
+        clear_item_group_values(frm)
+
+        frm.set_value('sync_based_on', '');
+        
         frm.toggle_display('section_break_options', false);
-        frm.remove_custom_button('Sync WooCommerce Items')
+        frm.toggle_display('sync_based_on', false);
+        frm.toggle_display('item_group', false);
+        
+        frm.remove_custom_button('Sync WooCommerce Items');
+        frm.remove_custom_button('Sync Item Group');
+        frm.remove_custom_button('Sync Item');
+    }
+    
+    if (frm.doc.sync_options === 'Sync Single Item') {
+        clear_item_group_values(frm)
+        
+        frm.toggle_display('section_break_options', true);
+        frm.toggle_display('sync_based_on', true);
+        frm.toggle_display('item_group', false);
+        
+        frm.remove_custom_button('Sync Item Group');
+        frm.remove_custom_button('Sync WooCommerce Items');
+        
         frm.add_custom_button(__('Sync Item'), function() {
             if (frm.is_dirty()) {
                 frm.save().then(() => {
                     sync_item(frm);
                 })
-            }
-            else {
+            } else {
                 sync_item(frm);
             }
         });
     }
-    else if (frm.doc.sync_options === 'Bulk Sync') {
+    
+    if (frm.doc.sync_options === 'Sync Item Group') {
         clear_sync_based_on_values(frm);
         
-        frm.remove_custom_button('Sync Item');
-        frm.toggle_display('sync_based_on', false);
         frm.toggle_display('section_break_options', true);
+        frm.toggle_display('sync_based_on', false);
+        frm.toggle_display('item_group', true);
+        
         frm.set_value('sync_based_on', '');
-
+        
+        frm.remove_custom_button('Sync WooCommerce Items');
+        frm.remove_custom_button('Sync Item');
+        
+        frm.add_custom_button(__('Sync Item Group'), function() {
+            if (frm.is_dirty()) {
+                frm.save().then(() => {
+                    sync_item_group(frm);
+                })
+            } else {
+                sync_item_group(frm);
+            }
+        });
+    }
+    
+    if (frm.doc.sync_options === 'Sync All Items') {
+        clear_sync_based_on_values(frm);
+        clear_item_group_values(frm)
+        
+        frm.remove_custom_button('Sync Item');
+        frm.remove_custom_button('Sync Item Group');
+        
+        frm.toggle_display('section_break_options', true);
+        frm.toggle_display('sync_based_on', false);
+        frm.toggle_display('item_group', false);
+        
+        frm.set_value('sync_based_on', '');
+        
         frm.add_custom_button(__('Sync WooCommerce Items'), function() {
             frappe.call({
                 method:"woocommerce_sync.api.sync_woocommerce_items",
@@ -93,6 +143,14 @@ function clear_sync_based_on_values(frm) {
     }
 }
 
+function clear_item_group_values(frm) {
+    frm.set_value('item_group', '');
+    
+    if (frm.is_dirty()) {
+        frm.save()
+    }
+}
+
 function sync_item(frm) {
     if( frm.doc.enable_sync) {
         if (frm.doc.sync_based_on) {
@@ -109,16 +167,31 @@ function sync_item(frm) {
                         frappe.msgprint(`Successfully Synced WooCommerce Product ID ${frm.doc.woocommerce_product_id}.`);
                     }
                 })
-            }
-            else {
+            } else {
                 frappe.msgprint('Error Syncing Item: Enter Item Code / WooCommerce Product ID');
             }
-        }
-        else {
+        } else {
             frappe.msgprint('Error Syncing Item: Select Item Code / WooCommerce Product ID from Sync Based On');
         }
-    } 
-    else {
+    } else {
+        frappe.msgprint('Error Syncing Item: WooCommerc Sync is not enabled. Select \'Enable Sync\' to sync to woocommerce.');
+    }
+}
+
+function sync_item_group(frm) {
+    if(frm.doc.enable_sync) {
+        if(frm.doc.item_group) {
+            frappe.call({
+                method:"woocommerce_sync.api.sync_item_group_to_woocommerce",
+                freeze: true,
+                freeze_message: __('Syncing Item Group...')                            
+            }).then(() => {
+                frappe.msgprint(`Successfully Synced Item Group ${frm.doc.item_group}.`);
+            })
+        } else {
+            frappe.msgprint('Error Syncing Item Group: Select an Item Group');
+        }
+    } else {
         frappe.msgprint('Error Syncing Item: WooCommerc Sync is not enabled. Select \'Enable Sync\' to sync to woocommerce.');
     }
 }
